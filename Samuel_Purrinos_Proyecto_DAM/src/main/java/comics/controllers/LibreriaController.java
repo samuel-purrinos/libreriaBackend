@@ -46,7 +46,12 @@ public class LibreriaController {
 	 */
 	@GetMapping("/findAll")
 	public Iterable<Numero> findAll() {
-		return repository.findAll();
+		Iterable<Numero> todos=repository.findAll();
+		for(Numero n:todos) {
+			n.setImagen();
+			System.out.println(n.getImagen());;
+		}
+		return todos;
 	}
 	/**
 	 * Encuentra todas las colecciones
@@ -127,5 +132,6 @@ public class LibreriaController {
 	public String getIndexayuda(Model modelo) {
 		return "indexayuda";
 	}
-
+	
+	
 }

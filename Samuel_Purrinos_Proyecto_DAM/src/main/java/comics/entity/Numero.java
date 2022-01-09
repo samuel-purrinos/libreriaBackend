@@ -1,6 +1,7 @@
 package comics.entity;
 
 import java.io.Serializable;
+import java.util.Base64;
 import java.util.Date;
 
 import javax.persistence.CascadeType;
@@ -15,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -22,6 +24,7 @@ import org.hibernate.type.BlobType;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -50,6 +53,8 @@ public class Numero implements Serializable{
 	private double precio;
 	@Lob
 	private byte[] portada;
+	@Transient
+	private String imagen;
 	@ManyToOne(fetch = FetchType.EAGER, optional = false,cascade=  CascadeType.MERGE)
     @JoinColumn(name = "coleccion_id",nullable=false)
 	@OnDelete(action = OnDeleteAction.CASCADE)
@@ -134,6 +139,13 @@ public class Numero implements Serializable{
 
 	public void setFecha_publicacion(Date fecha_publicacion) {
 		this.fecha_publicacion = fecha_publicacion;
+	}
+	
+	public void setImagen() {
+		imagen = Base64.getEncoder().encodeToString(portada);
+	}
+	public String getImagen() {
+		return imagen;
 	}
 	public enum Estado {
 	    malo, roto, bueno, excelente
