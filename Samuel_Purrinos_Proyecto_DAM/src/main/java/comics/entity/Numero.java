@@ -141,9 +141,9 @@ public class Numero implements Serializable{
 		this.fecha_publicacion = fecha_publicacion;
 	}
 	
-	public void setImagen() {
+	/**public void setImagen() {
 		imagen = Base64.getEncoder().encodeToString(portada);
-	}
+	}*/
 	public String getImagen() {
 		return imagen;
 	}

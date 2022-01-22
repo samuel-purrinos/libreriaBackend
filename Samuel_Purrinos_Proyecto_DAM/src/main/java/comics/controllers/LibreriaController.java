@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,10 +48,10 @@ public class LibreriaController {
 	@GetMapping("/findAll")
 	public Iterable<Numero> findAll() {
 		Iterable<Numero> todos=repository.findAll();
-		for(Numero n:todos) {
+		/*for(Numero n:todos) {
 			n.setImagen();
 			System.out.println(n.getImagen());;
-		}
+		}*/
 		return todos;
 	}
 	/**
@@ -79,9 +80,10 @@ public class LibreriaController {
 	 * @param coleccion
 	 * @return una lista de números
 	 */
-	@PostMapping(value = "/findbycoleccion", consumes = "application/json", produces = "application/json")
-	public Iterable<Numero> findByColeccion(@RequestBody Coleccion coleccion){
-		return repository.findByColeccionNombreAndColeccionEditorial(coleccion.getNombre(),coleccion.getEditorial());
+	@GetMapping(path = "/findbycoleccion/{nombre}", produces = "application/json")
+	public Iterable<Numero> findByColeccion(@PathVariable("nombre") String nombre){
+		Iterable<Numero> resultado=repository.findByColeccionNombre(nombre);
+		return resultado;
 	}
 	/**
 	 * Inserta el número y la colección pasados por parámetro en la base de datos
@@ -90,7 +92,7 @@ public class LibreriaController {
 	 */
 	@PostMapping(value = "/insertarnumero", consumes = "application/json", produces = "application/json")
 	public Numero insertNumero(@RequestBody Numero numero) {
-		System.out.println(numero.getColeccion().getId());
+		System.out.println(numero);
 		coleccionRepository.save(numero.getColeccion());
 		return repository.save(numero);
 	}
@@ -99,11 +101,10 @@ public class LibreriaController {
 	 * @param numero
 	 * @return
 	 */
-	@PostMapping(value = "/eliminanumero", consumes = "application/json", produces = "application/json")
-	public ResponseEntity<String> eliminaNumero(@RequestBody Numero numero) {
-		System.out.println(numero.getAutor());
-		repository.delete(numero);
-		coleccionRepository.delete(numero.getColeccion());
+	@GetMapping(path = "/eliminanumero/{id}", produces = "application/json")
+	public ResponseEntity<String> eliminaNumero(@PathVariable("id") int id) {
+		System.out.println("Vamos a eliminar : "+id);
+		repository.deleteById(id);
 		return new ResponseEntity<>("Se ha borrado correctamente",HttpStatus.OK);
 	}
 	

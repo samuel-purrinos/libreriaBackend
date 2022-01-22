@@ -17,7 +17,7 @@ import comics.entity.Numero;
 
 @Repository
 public interface ComicRepository extends CrudRepository<Numero,Integer>{
-	List<Numero> findByColeccionNombreAndColeccionEditorial(String nombre,String editorial);
+	List<Numero> findByColeccionNombre(String nombre);
 	Numero findByVolumenAndColeccionNombre(int volumen,String nombre);
 	Numero findById(int id);
 	
