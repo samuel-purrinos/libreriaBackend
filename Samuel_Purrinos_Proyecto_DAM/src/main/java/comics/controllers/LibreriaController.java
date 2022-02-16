@@ -10,9 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,68 +33,45 @@ import comics.entity.Numero;
  */
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("/numeros")
 public class LibreriaController {
 	
 	/**
 	 * Objetos que se encargan de hacer las consultas a la base de datos
 	 */
 	
-	@Autowired
 	private ComicRepository repository;
-	@Autowired
 	private ColeccionRepository coleccionRepository;
+	
+	public LibreriaController(ComicRepository repository, ColeccionRepository coleccionRepository) {
+		this.repository = repository;
+		this.coleccionRepository = coleccionRepository;
+	}
 	/**
 	 * Devuelve todos los cómics
 	 * @return una lista de todos los números de la base de datos
 	 */
-	@GetMapping("/findAll")
+	@GetMapping()
 	public Iterable<Numero> findAll() {
-		Iterable<Numero> todos=repository.findAll();
-		/*for(Numero n:todos) {
-			n.setImagen();
-			System.out.println(n.getImagen());;
-		}*/
-		return todos;
+		return repository.findAll();
 	}
-	/**
-	 * Encuentra todas las colecciones
-	 * @return una lista con todas las colecciones
-	 */
-	@GetMapping("/findAllCollections")
-	public Iterable<Coleccion> findAllCollections() {
-
-		return coleccionRepository.findAll();
-	}
-	/**
-	 * Encuentra en número cuyo volumen y nombre de colección coinciden con las pasados por parámetro
-	 * @param numero
-	 * @return devuelve un número
-	 */
-	@PostMapping(value = "/findbynombreandvolumen", consumes = "application/json", produces = "application/json")
-	public Numero findByNombreAndVolumen(@RequestBody Numero numero) {
-		System.out.println("Coleccion : "+numero.getColeccion().getNombre()+" Volumen : "+numero.getVolumen());
-		Numero resultado=repository.findByVolumenAndColeccionNombre(numero.getVolumen(), numero.getColeccion().getNombre());
-		if(resultado!=null)System.out.println("Econtrado : "+resultado.getId());
-		return resultado;
-	}
+	
 	/**
 	 * Devuelve los número cuyo nombre de editorial y colección coincidan con los pasados por parámetro
 	 * @param coleccion
 	 * @return una lista de números
 	 */
-	@GetMapping(path = "/findbycoleccion/{nombre}", produces = "application/json")
+	@GetMapping(path = "/{nombre}")
 	public Iterable<Numero> findByColeccion(@PathVariable("nombre") String nombre){
-		Iterable<Numero> resultado=repository.findByColeccionNombre(nombre);
-		return resultado;
+		return repository.findByColeccionNombre(nombre);
 	}
 	/**
 	 * Inserta el número y la colección pasados por parámetro en la base de datos
 	 * @param numero
 	 * @return
 	 */
-	@PostMapping(value = "/insertarnumero", consumes = "application/json", produces = "application/json")
+	@PostMapping()
 	public Numero insertNumero(@RequestBody Numero numero) {
-		System.out.println(numero);
 		coleccionRepository.save(numero.getColeccion());
 		return repository.save(numero);
 	}
@@ -101,11 +80,9 @@ public class LibreriaController {
 	 * @param numero
 	 * @return
 	 */
-	@GetMapping(path = "/eliminanumero/{id}", produces = "application/json")
-	public ResponseEntity<String> eliminaNumero(@PathVariable("id") int id) {
-		System.out.println("Vamos a eliminar : "+id);
+	@DeleteMapping("/{id}")
+	public void eliminaNumero(@PathVariable("id") int id) {
 		repository.deleteById(id);
-		return new ResponseEntity<>("Se ha borrado correctamente",HttpStatus.OK);
 	}
 	
 	/**
@@ -113,20 +90,11 @@ public class LibreriaController {
 	 * @param numero
 	 * @return
 	 */
-	@PostMapping(value = "/updatenumero", consumes = "application/json", produces = "application/json")
-	public ResponseEntity<String> updateNumero(@RequestBody Numero numero) {
-		System.out.println("Numero : "+numero.getId()+" Coleccion : "+numero.getColeccion().getId());
-		Numero temporal =repository.findById(numero.getId());
-		temporal.setAutor(numero.getAutor());
-		temporal.setColeccion(numero.getColeccion());
-		temporal.setFecha_compra(numero.getFecha_compra());
-		temporal.setPortada(numero.getPortada());
-		temporal.setFecha_publicacion(numero.getFecha_publicacion());
-		temporal.setEstado(numero.getEstado());
-		temporal.setPrecio(numero.getPrecio());
-		temporal.setVolumen(numero.getVolumen());
-		repository.save(temporal);
-		return new ResponseEntity<>("Se ha actualizado correctamente",HttpStatus.OK);
+	@PutMapping("/{id}")
+	public ResponseEntity<Numero> updateNumero(@PathVariable int id,@RequestBody Numero numero) {
+		return (!repository.existsById(id)) ?
+				new ResponseEntity<>(repository.save(numero),HttpStatus.CREATED) :
+				new ResponseEntity<>(repository.save(numero), HttpStatus.OK)	;
 	}
 	
 	@GetMapping(value="/index",produces = "text/html")
