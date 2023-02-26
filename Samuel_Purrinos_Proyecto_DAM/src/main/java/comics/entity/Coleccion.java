@@ -19,10 +19,6 @@ import lombok.NoArgsConstructor;
  *
  */
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-@Builder
 public class Coleccion implements Serializable{
 	
 

@@ -39,10 +39,6 @@ import lombok.NoArgsConstructor;
  *
  */
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-@Builder
 public class Numero implements Serializable{
 	
 	@Id

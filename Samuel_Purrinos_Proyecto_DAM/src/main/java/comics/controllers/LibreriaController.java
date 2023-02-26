@@ -99,7 +99,7 @@ public class LibreriaController {
 	
 	@GetMapping(value="/index",produces = "text/html")
 	public String getIndexayuda(Model modelo) {
-		return "indexayuda";
+		return "ayudaindex";
 	}
 	
 	
